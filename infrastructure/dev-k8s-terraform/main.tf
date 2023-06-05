@@ -149,13 +149,13 @@ EOF
 
 resource "aws_iam_instance_profile" "petclinic-master-serverprofile" {
   name = "petclinic-master-serverprofile"
-  role = aws_iam_role.petclinic-master-server-s3-role.name
+  role = aws_iam_role.petclinic-master-server-s3role.name
 }
 
 resource "aws_instance" "kube-master" {
     ami = "ami-053b0d53c279acc90"
     instance_type = "t3a.medium"
-    iam_instance_profile = aws_iam_instance_profile.petclinic-master-server-profile.name
+    iam_instance_profile = aws_iam_instance_profile.petclinic-master-serverprofile.name
     vpc_security_group_ids = [aws_security_group.petclinic-kube-master-sg.id, aws_security_group.petclinic-mutual-sg.id]
     key_name = "okermenpair"
     subnet_id = "subnet-0c99d9aeae4e9999e"  # select own subnet_id of us-east-1a
