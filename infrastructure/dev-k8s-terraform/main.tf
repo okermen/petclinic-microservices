@@ -126,13 +126,38 @@ resource "aws_security_group" "petclinic-kube-master-sg" {
   }
 }
 
+resource "aws_iam_role" "petclinic-master-server-s3-role" {
+  name               = "petclinic-master-server-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"]
+}
+
+resource "aws_iam_instance_profile" "petclinic-master-server-profile" {
+  name = "petclinic-master-server-profile"
+  role = aws_iam_role.petclinic-master-server-s3-role.name
+}
 
 resource "aws_instance" "kube-master" {
     ami = "ami-053b0d53c279acc90"
     instance_type = "t3a.medium"
-    iam_instance_profile = "petclinic-master-server-profile"
+    iam_instance_profile = aws_iam_instance_profile.petclinic-master-server-profile.name
     vpc_security_group_ids = [aws_security_group.petclinic-kube-master-sg.id, aws_security_group.petclinic-mutual-sg.id]
-    key_name = "clarus"
+    key_name = "okermenpair"
     subnet_id = "subnet-0c99d9aeae4e9999e"  # select own subnet_id of us-east-1a
     availability_zone = "us-east-1a"
     tags = {
@@ -148,7 +173,7 @@ resource "aws_instance" "worker-1" {
     ami = "ami-053b0d53c279acc90"
     instance_type = "t3a.medium"
     vpc_security_group_ids = [aws_security_group.petclinic-kube-worker-sg.id, aws_security_group.petclinic-mutual-sg.id]
-    key_name = "clarus"
+    key_name = "okermenpair"
     subnet_id = "subnet-0c99d9aeae4e9999e"  # select own subnet_id of us-east-1a
     availability_zone = "us-east-1a"
     tags = {
@@ -164,7 +189,7 @@ resource "aws_instance" "worker-2" {
     ami = "ami-053b0d53c279acc90"
     instance_type = "t3a.medium"
     vpc_security_group_ids = [aws_security_group.petclinic-kube-worker-sg.id, aws_security_group.petclinic-mutual-sg.id]
-    key_name = "clarus"
+    key_name = "okermenpair"
     subnet_id = "subnet-0c99d9aeae4e9999e"  # select own subnet_id of us-east-1a
     availability_zone = "us-east-1a"
     tags = {
