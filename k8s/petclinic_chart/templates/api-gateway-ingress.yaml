@@ -8,12 +8,17 @@ metadata:
     kompose.service.nodeport.port: "30001"
     kompose.service.type: nodeport
     kompose.version: 1.28.0 (c4137012e)
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   creationTimestamp: null
   labels:
     io.kompose.service: api-gateway
   name: api-gateway
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - petclinic.oguzhankermen.com
+    secretName: petclinic-tls
   rules:
     - host: '{{ .Values.DNS_NAME }}'
       http:
